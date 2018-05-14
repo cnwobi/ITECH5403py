@@ -66,7 +66,7 @@ def add_member():
         array_list_member.append(Member(member_name))
         new_member = array_list_member[len(array_list_member) - 1]
         print(f"Member [{new_member.name}] has been created with member ID: [{new_member.id}]")
-        continue_process("Would you like to [a]dd a new member or go-[b]ack to the previous menu?", "a",
+        continue_process("Would you like to [a]dd a new member or go-[b]ack to the previous menu?\n", "a",
                          "b",
                          "Invalid selection please enter [a] to add new member or [b] to go back to menu\n")
 
@@ -187,37 +187,61 @@ def process_borrowing():
     global array_list_book
     book_exist_flag = True
     member_exist_flag = True
+    global add_flag
+    add_flag = True
+    while add_flag:
+        member_id = validate("Please enter a valid member ID:\n", "A valid member ID must be a positive integer")
+        if len(array_list_member):
+            for member in array_list_member:
+                if member.id == member_id:
+                    member_exist_flag = True
 
-    member_id = validate("Please enter a valid member ID:\n", "A valid member ID must be a positive integer")
+                    book_id = validate(f"Please enter a valid book ID for borrowing by member [{member.name}]:",
+                                       "A valid book ID must be a positive integer")
 
-    for member in array_list_member:
-        if member.id == member_id:
-            member_exist_flag = True
-
-            book_id = validate(f"Please enter a valid book ID for borrowing by member [{member.name}]:",
-                               "A valid book ID must be a positive integer")
-
-            for book in array_list_book:
-                if book.id == book_id and book.number_of_copies > 0:
-                    book.add_borrower(member)
-                    book.number_of_copies = book.number_of_copies - 1
-                    member.add_borrowed_book(book)
-                    print(f"*** Borrowing processed successfully***\n"
-                          f"Member:{member.name}\n"
-                          f"Borrowed Book title: {book.title}\n"
-                          f"Number of books remaining: {book.number_of_copies}\n ")
-                    break
-                elif book.id == book_id and book.number_of_copies <= 0:
-                    print(f"Sorry!!! Book titled [{book.title}] currently is not available for borrowing.")
-                    break
-                elif book_id != book.id:
-                    book_exist_flag = False;
-            if not book_exist_flag:
-                print("Book does not exist")
+                    for book in array_list_book:
+                        if book.id == book_id and book.number_of_copies > 0:
+                            book.add_borrower(member)
+                            book.number_of_copies = book.number_of_copies - 1
+                            member.add_borrowed_book(book)
+                            print(f"*** Borrowing processed successfully***\n"
+                                  f"Member:{member.name}\n"
+                                  f"Borrowed Book title: {book.title}\n"
+                                  f"Number of books remaining: {book.number_of_copies}\n ")
+                            continue_process(
+                                " Would you like to [p]rocess a new borrowing or go-[b]ack to the previous menu?\n", "p",
+                                "b",
+                                "Invalid selection please enter [p] to process a new borrowing or [b] to go back to menu\n")
+                            break
+                        elif book.id == book_id and book.number_of_copies <= 0:
+                            print(f"Sorry!!! Book titled [{book.title}] currently is not available for borrowing.")
+                            continue_process(
+                                " Would you like to [p]rocess a new borrowing or go-[b]ack to the previous menu?\n", "p",
+                                "b",
+                                "Invalid selection please enter [p] to process a new borrowing or [b] to go back to menu\n")
+                            break
+                        elif book_id != book.id:
+                            book_exist_flag = False;
+                    if not book_exist_flag:
+                        print("Book does not exist")
+                    continue_process(
+                        " Would you like to [p]rocess a new borrowing or go-[b]ack to the previous menu?\n", "p",
+                        "b",
+                        "Invalid selection please enter [p] to process a new borrowing or [b] to go back to menu\n")
+                else:
+                    member_exist_flag = False
+            if not member_exist_flag:
+                print(f"Member with id[{member_id}] does not exist")
+                continue_process(
+                    " Would you like to [p]rocess a new borrowing or go-[b]ack to the previous menu?\n", "p",
+                    "b",
+                    "Invalid selection please enter [p] to process a new borrowing or [b] to go back to menu\n")
         else:
-            member_exist_flag = False
-    if not member_exist_flag:
-        print(f"Member with id[{member_id}] does not exist")
+            print("No members in the library yet...Please add new members before checking status")
+            continue_process(
+                " Would you like to [p]rocess a new borrowing or go-[b]ack to the previous menu?\n", "p",
+                "b",
+                "Invalid selection please enter [p] to process a new borrowing or [b] to go back to menu\n")
 
 
 def view_member_status():
